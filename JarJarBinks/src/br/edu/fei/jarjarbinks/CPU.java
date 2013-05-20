@@ -51,12 +51,14 @@ public class CPU {
 		for(int i=0; i<tabelaCodeSegment.length;i++){
 			if(MainWindow.frame.txtCodeSegment.getModel().getValueAt(i,1)!=null){
 				int a = Integer.valueOf(((String)MainWindow.frame.txtCodeSegment.getModel().getValueAt(i,1)).replaceAll(" ", ""),2);
-				mem.setWord(i+257, new Word(a));
+				Word wa = new Word(a);
+				mem.setByte(wa.getWord()[0],257+(2*i) );
+				mem.setByte(wa.getWord()[1],258+(2*i) );
 			}
 		}
 		
-		pc.setContents(Conversor.twoWordCreator(0x0101));
-		System.out.println(Conversor.twoWordToInt(pc.getContents()));
+		pc.setWord(new Word(0x0101));
+		System.out.println(pc.getWord().toInt());
 		isInitialized = true;
 	}
 	

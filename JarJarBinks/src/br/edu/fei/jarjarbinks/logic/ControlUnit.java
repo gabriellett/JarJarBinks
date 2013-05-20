@@ -2,12 +2,11 @@ package br.edu.fei.jarjarbinks.logic;
 
 import br.edu.fei.jarjarbinks.CPU;
 import br.edu.fei.jarjarbinks.bean.Word;
-import br.edu.fei.jarjarbinks.util.Conversor;
 
 public class ControlUnit {
 	
 	private void fetch(){
-		CPU.mar.setContents(CPU.pc.getContents());
+		CPU.mar.setWord(CPU.pc.getWord());
 		CPU.mem.load();
 	}
 	
@@ -19,14 +18,14 @@ public class ControlUnit {
 		
 		//MOV
 		if("0001".equals(opcode.substring(0,4))){
-			CPU.pc.incOne();
+			
 			fetch();
-			CPU.mar.setContents(Conversor.twoWordCreator(CPU.mdr.getWord().toInt()));
-			System.out.println("TO:"+Integer.toHexString(Conversor.twoWordToInt(CPU.mar.getContents())));
 			CPU.pc.incOne();
+			System.out.println("TO:"+Integer.toHexString(CPU.mdr.getWord().toInt()));
 			CPU.donatello.setWord(CPU.mdr.getWord());
+			CPU.pc.incOne();
 			fetch();
-			CPU.mar.setContents(new Word[]{Word.getZeroWord(),CPU.donatello.getWord()});
+			CPU.mar.setWord(CPU.donatello.getWord());
 			System.out.println("Value:"+Integer.toHexString(CPU.mdr.getWord().toInt()));
 			CPU.mem.store();
 		}

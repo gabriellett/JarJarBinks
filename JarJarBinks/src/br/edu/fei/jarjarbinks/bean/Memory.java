@@ -1,11 +1,9 @@
 package br.edu.fei.jarjarbinks.bean;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 
 import br.edu.fei.jarjarbinks.CPU;
 import br.edu.fei.jarjarbinks.ui.MainWindow;
-import br.edu.fei.jarjarbinks.util.Conversor;
 
 /**
  * 0~~255: Memoria Programa 
@@ -46,10 +44,10 @@ public class Memory {
 	}
 	
 	public void load(){
-		CPU.mdr.setWord(this.getWord(Conversor.twoWordToInt(CPU.mar.getContents())));
+		CPU.mdr.setWord(this.getWord(CPU.mar.getWord().toInt()));
 	}
 	
 	public void store(){
-		this.setWord(Conversor.twoWordToInt(CPU.mar.getContents()),CPU.mdr.getWord());
+		this.setWord(CPU.mar.getWord().toInt(),CPU.mdr.getWord());
 	}
 }
