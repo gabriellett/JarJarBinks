@@ -1,13 +1,26 @@
 package br.edu.fei.jarjarbinks.bean;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
+import br.edu.fei.jarjarbinks.CPU;
+import br.edu.fei.jarjarbinks.ui.MainWindow;
+import br.edu.fei.jarjarbinks.util.Conversor;
+
+/**
+ * 0~~255: Memoria Programa 
+ * |- 0~~32: Memoria Interna
+ * |- 33~~255: Memoria Externa
+ * 255~~65536: Code Segment
+ * @author Gabriel
+ *
+ */
 public class Memory {
 	
-	ArrayList<Byte> memArr;
+	HashMap<Integer,Byte> memArr;
 	
-	Memory(){
-		memArr = new ArrayList<Byte>(65536);
+	public Memory(){
+		memArr = new HashMap<Integer,Byte>();
 	}
 	
 	public Byte getByte(int position){
@@ -15,7 +28,7 @@ public class Memory {
 	}
 	
 	public void setByte(Byte byteValue, int position){
-		memArr.set(position, byteValue);
+		memArr.put(position, byteValue);
 	}
 	
 	public Word getWord(int position){
@@ -24,7 +37,19 @@ public class Memory {
 	}
 	
 	public void setWord(int position, Word word){
-		memArr.set(position, word.getWord()[0]);
-		memArr.set(position+1, word.getWord()[1]);
+		if(position<=256){
+			//Update modelo
+			MainWindow.frame.txtMemoria.getModel().setValueAt(Integer.toHexString(word.toInt()), position/16,position-(position/16));
+		}
+		memArr.put(position, word.getWord()[0]);
+		memArr.put(position+1, word.getWord()[1]);
+	}
+	
+	public void load(){
+		CPU.mdr.setWord(this.getWord(Conversor.twoWordToInt(CPU.mar.getContents())));
+	}
+	
+	public void store(){
+		this.setWord(Conversor.twoWordToInt(CPU.mar.getContents()),CPU.mdr.getWord());
 	}
 }
