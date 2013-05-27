@@ -39,6 +39,48 @@ public class MainWindow extends JFrame {
 	private JTextField txtMDR;
 	public static MainWindow frame;
 	
+	public void setPC(String val){
+		this.txtPC.setText(val);
+	}
+
+	public void setPSW(String val){
+		this.txtPSW.setText(val);
+	}
+	
+	public void setMBR(String val){
+		this.txtMBR.setText(val);
+	}
+	
+	public void setMAR(String val){
+		this.txtMAR.setText(val);
+	}
+	
+	public void setMDR(String val){
+		this.txtMDR.setText(val);
+	}
+	public void setR1(String val){
+		this.txtR1.setText(val);
+	}
+	
+	public void setR2(String val){
+		this.txtR2.setText(val);
+	}
+	
+	public void setR3(String val){
+		this.txtR3.setText(val);
+	}
+	
+	public void setR4(String val){
+		this.txtR4.setText(val);
+	}
+	public void setACC(String val){
+		this.txtACC.setText(val);
+	}
+	
+	public void setB(String val){
+		this.txtB.setText(val);
+	}
+	
 	/**
 	 * @return the tabelaCodeSegment
 	 */
@@ -84,6 +126,11 @@ public class MainWindow extends JFrame {
 		for(int i=0;i<65280;i++){
 			tabelaCodeSegment[i][0] = String.format("%04X", i+256);//Integer.toHexString(i+256).toUpperCase();
 		}
+		
+		tabelaCodeSegment[0][1] = "0001 0000 0000 0000";
+		tabelaCodeSegment[1][1] = "0000 0000 0110 1010";
+		tabelaCodeSegment[2][1] = "0000 0000 0101 1011";
+		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 712, 745);
 		contentPane = new JPanel();

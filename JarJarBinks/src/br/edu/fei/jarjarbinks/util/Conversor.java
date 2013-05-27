@@ -2,6 +2,7 @@ package br.edu.fei.jarjarbinks.util;
 
 import java.nio.ByteBuffer;
 
+import br.edu.fei.jarjarbinks.CPU;
 import br.edu.fei.jarjarbinks.bean.Byte;
 import br.edu.fei.jarjarbinks.bean.Word;
 import br.edu.fei.jarjarbinks.exception.InvalidVarSize;

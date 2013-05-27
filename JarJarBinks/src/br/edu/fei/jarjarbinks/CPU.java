@@ -24,16 +24,19 @@ public class CPU {
 	public static final MBR mbr = new MBR();
 	public static final MAR mar = new MAR();
 	public static final MDR mdr = new MDR();
+	
+	/* CPU internal register */
+	private static final AuxiliarRegister auxReg = new AuxiliarRegister();
 
 	/* Registers */
-	public static final AuxiliarRegister michelangelo = new AuxiliarRegister();
-	public static final AuxiliarRegister donatello    = new AuxiliarRegister();
-	public static final AuxiliarRegister rafael       = new AuxiliarRegister();
-	public static final AuxiliarRegister leonardo     = new AuxiliarRegister();
-	
+	private static final AuxiliarRegister michelangelo = new AuxiliarRegister();
+	private static final AuxiliarRegister donatello    = new AuxiliarRegister();
+	private static final AuxiliarRegister rafael       = new AuxiliarRegister();
+	private static final AuxiliarRegister leonardo     = new AuxiliarRegister();
+
 	/* Acumulators */
-	public static final AuxiliarRegister acme         = new AuxiliarRegister();
-	public static final AuxiliarRegister america	  = new AuxiliarRegister();
+	private static final AuxiliarRegister acme         = new AuxiliarRegister();
+	private static final AuxiliarRegister america	  = new AuxiliarRegister();
 	
 	public static final ArithmeticLogicUnit alu = new ArithmeticLogicUnit();
 	public static final ControlUnit cu = new ControlUnit();
@@ -51,9 +54,13 @@ public class CPU {
 		for(int i=0; i<tabelaCodeSegment.length;i++){
 			if(MainWindow.frame.txtCodeSegment.getModel().getValueAt(i,1)!=null){
 				int a = Integer.valueOf(((String)MainWindow.frame.txtCodeSegment.getModel().getValueAt(i,1)).replaceAll(" ", ""),2);
+				System.out.println("CS "+i+":"+a);
+				System.out.println("CS "+i+":"+Integer.toBinaryString(a));
+				System.out.println("CS "+i+":"+Integer.toHexString(a));
 				Word wa = new Word(a);
-				mem.setByte(wa.getWord()[0],257+(2*i) );
-				mem.setByte(wa.getWord()[1],258+(2*i) );
+				mem.setWord(257+(2*i),wa);
+				//mem.setByte(257+(2*i),wa.getWord()[0] );
+				//mem.setByte(258+(2*i),wa.getWord()[1] );
 			}
 		}
 		
@@ -66,5 +73,62 @@ public class CPU {
 		//if(!isInitialized) 
 		initialize();
 		cu.executeNextInst();
+	}
+	public static AuxiliarRegister getMichelangelo() {
+		return michelangelo;
+	}
+
+	public static AuxiliarRegister getDonatello() {
+		return donatello;
+	}
+
+	public static AuxiliarRegister getRafael() {
+		return rafael;
+	}
+
+	public static AuxiliarRegister getLeonardo() {
+		return leonardo;
+	}
+
+	public static AuxiliarRegister getAcme() {
+		return acme;
+	}
+
+	public static AuxiliarRegister getAmerica() {
+		return america;
+	}
+	
+	public static void setMichelangelo(Word word) {
+		MainWindow.frame.setR1(Integer.toHexString(word.toInt()));
+		michelangelo.setWord(word);
+	}
+
+	public static void setDonatello(Word word) {
+		MainWindow.frame.setR2(Integer.toHexString(word.toInt()));
+		donatello.setWord(word);
+	}
+
+	public static void setRafael(Word word) {
+		MainWindow.frame.setR3(Integer.toHexString(word.toInt()));
+		rafael.setWord(word);
+	}
+
+	public static void setLeonardo(Word word) {
+		MainWindow.frame.setR4(Integer.toHexString(word.toInt()));
+		leonardo.setWord(word);
+	}
+
+	public static void setAcme(Word word) {
+		MainWindow.frame.setACC(Integer.toHexString(word.toInt()));
+		acme.setWord(word);
+	}
+
+	public static void setAmerica(Word word) {
+		MainWindow.frame.setB(Integer.toHexString(word.toInt()));
+		america.setWord(word);
+	}
+	
+	public static void setAux(Word word) {
+		auxReg.setWord(word);
 	}
 }

@@ -1,41 +1,40 @@
 package br.edu.fei.jarjarbinks.logic;
 
 import br.edu.fei.jarjarbinks.CPU;
-import br.edu.fei.jarjarbinks.bean.Word;
+import br.edu.fei.jarjarbinks.instructions.Instruction;
+import br.edu.fei.jarjarbinks.instructions.impl.MOV;
 
 public class ControlUnit {
 	
-	private void fetch(){
+	public void fetch(){
 		CPU.mar.setWord(CPU.pc.getWord());
 		CPU.mem.load();
 	}
 	
-	private void decode(){
+	public Instruction decode(){
 		String opcode = Integer.toBinaryString(CPU.mdr.getWord().toInt());
 		while(opcode.length()<16){
 			opcode = "0"+opcode;
 		}
 		
-		//MOV
-		if("0001".equals(opcode.substring(0,4))){
-			
-			fetch();
-			CPU.pc.incOne();
-			System.out.println("TO:"+Integer.toHexString(CPU.mdr.getWord().toInt()));
-			CPU.donatello.setWord(CPU.mdr.getWord());
-			CPU.pc.incOne();
-			fetch();
-			CPU.mar.setWord(CPU.donatello.getWord());
-			System.out.println("Value:"+Integer.toHexString(CPU.mdr.getWord().toInt()));
-			CPU.mem.store();
+		Instruction inst = new MOV();
+		if(inst.checkResponsability()){
+			return inst;
 		}
+		
+		return null;
+		
 	}
 	
-	private void execute(){
+	private void execute(Instruction inst){
+		inst.execute();
 		
 	}
 	public void executeNextInst(){
+		
 		fetch();
-		decode();
+		CPU.pc.nextInst();
+		Instruction inst = decode();
+		execute(inst);
 	}
 }

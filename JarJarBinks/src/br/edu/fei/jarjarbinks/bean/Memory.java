@@ -25,7 +25,7 @@ public class Memory {
 		return memArr.get(position);
 	}
 	
-	public void setByte(Byte byteValue, int position){
+	public void setByte(int position, Byte byteValue){
 		memArr.put(position, byteValue);
 	}
 	
@@ -37,7 +37,7 @@ public class Memory {
 	public void setWord(int position, Word word){
 		if(position<=256){
 			//Update modelo
-			MainWindow.frame.txtMemoria.getModel().setValueAt(Integer.toHexString(word.toInt()), position/16,position-(position/16));
+			MainWindow.frame.txtMemoria.getModel().setValueAt(Integer.toHexString(word.toInt()), position/16,((position-(position/16))/10)+1);
 		}
 		memArr.put(position, word.getWord()[0]);
 		memArr.put(position+1, word.getWord()[1]);
