@@ -1,6 +1,7 @@
 package br.edu.fei.jarjarbinks.bean.register;
 
 import br.edu.fei.jarjarbinks.bean.Word;
+import br.edu.fei.jarjarbinks.exception.InvalidVarSize;
 import br.edu.fei.jarjarbinks.ui.MainWindow;
 
 public class PC extends Register{
@@ -12,13 +13,16 @@ public class PC extends Register{
 	}
 
 	public void setWord(Word word) {
-		MainWindow.frame.setPC(Integer.toHexString(word.toInt()));
-		System.out.println("PC set to:"+Integer.toHexString(word.toInt()));
+		MainWindow.frame.setPC(String.format("%04X", word.toInt()));
+		
+		MainWindow.frame.txtCodeSegment.setRowSelectionInterval((word.toInt()-256), (word.toInt()-256));
+
+		System.out.println("PC  set to:"+String.format("%04X", word.toInt()));
 		this.word = word;
 	}
 	
-	public void nextInst(){
+	public void nextInst() throws InvalidVarSize{
 		// Aponta para proxima word
-		this.setWord(new Word(word.toInt()+2));
+		this.setWord(new Word(word.toInt()+1));
 	}
 }

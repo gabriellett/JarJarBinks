@@ -1,45 +1,39 @@
 package br.edu.fei.jarjarbinks.instructions.impl;
 
-import java.lang.reflect.Method;
-
 import br.edu.fei.jarjarbinks.CPU;
+import br.edu.fei.jarjarbinks.bean.Bit;
 import br.edu.fei.jarjarbinks.bean.Opcode;
 import br.edu.fei.jarjarbinks.bean.Word;
-import br.edu.fei.jarjarbinks.enums.TipoOrigemDestino;
 import br.edu.fei.jarjarbinks.instructions.Common;
 import br.edu.fei.jarjarbinks.instructions.Instruction;
 import br.edu.fei.jarjarbinks.ui.MainWindow;
 
-public class MOV implements Instruction{
-	private String opcodeResp = "0001";
-	private String mnemonic = "SCANIA";
-	private String mnemonicEquiv = "MOV";
+public class PUSH implements Instruction{
+	private String opcodeResp = "1001";
+	private String mnemonic = "EMPURRE";
+	private String mnemonicEquiv = "PUSH";
 	
 	@Override
 	public void execute() throws Exception{
 		Opcode opcode = new Opcode(CPU.mdr.getWord());
 		
-		Method registerMethod = null;
-		
-		if(opcode.getDestiny() == TipoOrigemDestino.Memory){
-
-			CPU.cu.fetch();
-			CPU.setAuxAddr(CPU.mdr.getWord());
-			
-		}else if(opcode.getDestiny() == TipoOrigemDestino.Register){
-			registerMethod = CPU.class.getMethod("set"+opcode.getDestinyRegister(), Word.class);
+		boolean overflow = false;
+		if(CPU.sp.getWord()==null){
+			CPU.sp.setWord(new Word(0x0000));
+		}else if(CPU.sp.getWord().toInt()!=0x000F){
+			CPU.sp.incSP();
+		}else{
+			overflow = true;
 		}
 		
 		Common.parseOrigin(opcode);
-		
-		if(registerMethod==null){
-			CPU.mdr.setWord(CPU.getAuxData());
-			CPU.mar.setWord(CPU.getAuxAddr());
-			CPU.mem.store();
+		CPU.mar.setWord(CPU.sp.getWord());
+		CPU.mdr.setWord(CPU.getAuxData());
+		if(overflow){
+			CPU.psw.setOverflow(new Bit(true));
 		}else{
-			registerMethod.invoke(null, CPU.getAuxData());
+			CPU.mem.store();
 		}
-		
 	}
 
 	@Override

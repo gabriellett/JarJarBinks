@@ -1,6 +1,5 @@
 package br.edu.fei.jarjarbinks.bean.register;
 
-import br.edu.fei.jarjarbinks.bean.Byte;
 import br.edu.fei.jarjarbinks.bean.Word;
 import br.edu.fei.jarjarbinks.ui.MainWindow;
 

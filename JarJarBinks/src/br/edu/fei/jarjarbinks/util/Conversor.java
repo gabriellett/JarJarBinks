@@ -2,7 +2,6 @@ package br.edu.fei.jarjarbinks.util;
 
 import java.nio.ByteBuffer;
 
-import br.edu.fei.jarjarbinks.CPU;
 import br.edu.fei.jarjarbinks.bean.Byte;
 import br.edu.fei.jarjarbinks.bean.Word;
 import br.edu.fei.jarjarbinks.exception.InvalidVarSize;
@@ -49,5 +48,13 @@ public class Conversor {
 				(twoWord[1].getWord()[0].getValue()*(int)(Math.pow(Math.pow(2,8),1)))+
 				(twoWord[1].getWord()[1].getValue()*(int)(Math.pow(Math.pow(2,8),0)));
 		
+	}
+	
+	public static String fillOpcodeZero(String opcode){
+		while(opcode.length()<16){
+			opcode = "0"+opcode;
+		}
+		
+		return opcode;
 	}
 }

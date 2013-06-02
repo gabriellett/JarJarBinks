@@ -8,14 +8,14 @@ import br.edu.fei.jarjarbinks.bean.register.MBR;
 import br.edu.fei.jarjarbinks.bean.register.MDR;
 import br.edu.fei.jarjarbinks.bean.register.PC;
 import br.edu.fei.jarjarbinks.bean.register.PSW;
+import br.edu.fei.jarjarbinks.bean.register.SP;
+import br.edu.fei.jarjarbinks.exception.InvalidVarSize;
 import br.edu.fei.jarjarbinks.logic.ArithmeticLogicUnit;
 import br.edu.fei.jarjarbinks.logic.ControlUnit;
 import br.edu.fei.jarjarbinks.ui.MainWindow;
 import br.edu.fei.jarjarbinks.util.Conversor;
 
 public class CPU {
-	
-	private static final CPU INSTANCE = new CPU();
 	
 	public static final Memory mem = new Memory();
 	
@@ -24,9 +24,11 @@ public class CPU {
 	public static final MBR mbr = new MBR();
 	public static final MAR mar = new MAR();
 	public static final MDR mdr = new MDR();
+	public static final SP sp = new SP();
 	
 	/* CPU internal register */
-	private static final AuxiliarRegister auxReg = new AuxiliarRegister();
+	private static final AuxiliarRegister auxRegAddr = new AuxiliarRegister();
+	private static final AuxiliarRegister auxRegData = new AuxiliarRegister();
 
 	/* Registers */
 	private static final AuxiliarRegister michelangelo = new AuxiliarRegister();
@@ -43,36 +45,39 @@ public class CPU {
 	
 	public static boolean isInitialized = false;
 	
-	private static MainWindow janela;
-	
 	private CPU(){
 		/* DO_NOTHING */
 	}
 		
-	public static void initialize(){
+	public static void initialize() throws InvalidVarSize{
 		String tabelaCodeSegment[][] = MainWindow.frame.getTabelaCodeSegment();
+		System.out.println("CS VAL [ADDR]:     OPCODE     |INTEG|HEXA");
+		
 		for(int i=0; i<tabelaCodeSegment.length;i++){
 			if(MainWindow.frame.txtCodeSegment.getModel().getValueAt(i,1)!=null){
 				int a = Integer.valueOf(((String)MainWindow.frame.txtCodeSegment.getModel().getValueAt(i,1)).replaceAll(" ", ""),2);
-				System.out.println("CS "+i+":"+a);
-				System.out.println("CS "+i+":"+Integer.toBinaryString(a));
-				System.out.println("CS "+i+":"+Integer.toHexString(a));
+				System.out.println("CS "+(256+i)+" ["+String.format("%04X", 256+i)+"]:"+Conversor.fillOpcodeZero(Integer.toBinaryString(a))+"|"+String.format("%05d", a)+"|"+String.format("%04X", a));
 				Word wa = new Word(a);
-				mem.setWord(257+(2*i),wa);
+				mem.setWord(256+i,wa);
 				//mem.setByte(257+(2*i),wa.getWord()[0] );
 				//mem.setByte(258+(2*i),wa.getWord()[1] );
 			}
 		}
 		
-		pc.setWord(new Word(0x0101));
-		System.out.println(pc.getWord().toInt());
+		pc.setWord(new Word(0x0100));
+		
 		isInitialized = true;
 	}
 	
-	public static void execute(){
-		//if(!isInitialized) 
-		initialize();
-		cu.executeNextInst();
+	public static void run() throws Exception{
+		if(!isInitialized){
+			initialize();
+			if(CPU.psw.getTrap().getBit()==1)return;
+		}
+		while(true){
+			cu.executeNextInst();
+			if(CPU.psw.getTrap().getBit()==1)return;
+		}
 	}
 	public static AuxiliarRegister getMichelangelo() {
 		return michelangelo;
@@ -99,36 +104,48 @@ public class CPU {
 	}
 	
 	public static void setMichelangelo(Word word) {
-		MainWindow.frame.setR1(Integer.toHexString(word.toInt()));
+		MainWindow.frame.setR1(String.format("%04X", word.toInt()));
 		michelangelo.setWord(word);
 	}
 
 	public static void setDonatello(Word word) {
-		MainWindow.frame.setR2(Integer.toHexString(word.toInt()));
+		MainWindow.frame.setR2(String.format("%04X", word.toInt()));
 		donatello.setWord(word);
 	}
 
 	public static void setRafael(Word word) {
-		MainWindow.frame.setR3(Integer.toHexString(word.toInt()));
+		MainWindow.frame.setR3(String.format("%04X", word.toInt()));
 		rafael.setWord(word);
 	}
 
 	public static void setLeonardo(Word word) {
-		MainWindow.frame.setR4(Integer.toHexString(word.toInt()));
+		MainWindow.frame.setR4(String.format("%04X", word.toInt()));
 		leonardo.setWord(word);
 	}
 
 	public static void setAcme(Word word) {
-		MainWindow.frame.setACC(Integer.toHexString(word.toInt()));
+		MainWindow.frame.setACC(String.format("%04X", word.toInt()));
 		acme.setWord(word);
 	}
 
 	public static void setAmerica(Word word) {
-		MainWindow.frame.setB(Integer.toHexString(word.toInt()));
+		MainWindow.frame.setB(String.format("%04X", word.toInt()));
 		america.setWord(word);
 	}
+
+	public static void setAuxAddr(Word word) {
+		auxRegAddr.setWord(word);
+	}
 	
-	public static void setAux(Word word) {
-		auxReg.setWord(word);
+	public static Word getAuxAddr() {
+		return auxRegAddr.getWord();
+	}
+	
+	public static void setAuxData(Word word) {
+		auxRegData.setWord(word);
+	}
+	
+	public static Word getAuxData() {
+		return auxRegData.getWord();
 	}
 }

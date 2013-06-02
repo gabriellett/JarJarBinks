@@ -6,7 +6,9 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -14,14 +16,23 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
+import javax.swing.border.BevelBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 
 import br.edu.fei.jarjarbinks.CPU;
+import br.edu.fei.jarjarbinks.bean.Bit;
+import br.edu.fei.jarjarbinks.bean.Word;
+import br.edu.fei.jarjarbinks.exception.InvalidVarSize;
 
 public class MainWindow extends JFrame {
 
-	private JPanel contentPane;
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	
+	public JPanel contentPane;
 	private JTextField txtR1;
 	private JTextField txtR2;
 	private JTextField txtR3;
@@ -38,6 +49,8 @@ public class MainWindow extends JFrame {
 	private JTextField txtMAR;
 	private JTextField txtMDR;
 	public static MainWindow frame;
+	private JTextField txtLastInst;
+	private JTextField txtSP;
 	
 	public void setPC(String val){
 		this.txtPC.setText(val);
@@ -76,9 +89,17 @@ public class MainWindow extends JFrame {
 	public void setACC(String val){
 		this.txtACC.setText(val);
 	}
-	
+
 	public void setB(String val){
 		this.txtB.setText(val);
+	}
+
+	public void setLastInst(String val){
+		this.txtLastInst.setText(val);
+	}
+	
+	public void setSP(String val){
+		this.txtSP.setText(val);
 	}
 	
 	/**
@@ -99,10 +120,141 @@ public class MainWindow extends JFrame {
 	 * Launch the application.
 	 */
 	public static void main(String[] args) {
+		
+		
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
 					frame = new MainWindow();
+					
+					frame.tabelaRam = new String[16][17];
+					
+					for(int i=0;i<16;i++){
+						frame.tabelaRam[i][0] = Integer.toHexString(i).toUpperCase()+"0";
+					}
+					
+					
+					frame.tabelaCodeSegment = new String[65280][2];
+					for(int i=0;i+255<65280;i++){
+						frame.tabelaCodeSegment[i][0] = String.format("%04X", (i)+256);//Integer.toHexString(i+256).toUpperCase();
+					}
+
+					// Testes Imediato
+					frame.tabelaCodeSegment[0][1] = "0001 0001 0000 0000";
+					frame.tabelaCodeSegment[1][1] = "0000 0000 0110 1010";
+					frame.tabelaCodeSegment[2][1] = "0000 0000 0101 1011";
+
+					frame.tabelaCodeSegment[3][1] = "0001 0000 0000 0001";
+					frame.tabelaCodeSegment[4][1] = "0000 0000 0111 1001";
+					
+					
+					// Testes Direto
+					//RR
+					frame.tabelaCodeSegment[5][1] = "0001 0100 0001 0011";
+
+					// MR
+					frame.tabelaCodeSegment[6][1] = "0001 0110 0000 0010";
+					frame.tabelaCodeSegment[7][1] = "0000 0000 0110 1010";
+					
+					//MM
+					frame.tabelaCodeSegment[8][1] = "0001 0111 0000 0000";
+					frame.tabelaCodeSegment[9][1] = "0000 0000 1111 1111";
+					frame.tabelaCodeSegment[10][1] = "0000 0000 0110 1010";
+
+					//RM
+					frame.tabelaCodeSegment[11][1] = "0001 0101 0011 0000";
+					frame.tabelaCodeSegment[12][1] = "0000 0000 1011 1111";
+					
+					// Testes Indireto
+					frame.tabelaCodeSegment[13][1] = "0001 0000 0000 0000";
+					frame.tabelaCodeSegment[14][1] = "0000 0000 0110 1010";
+					
+					//RR
+					frame.tabelaCodeSegment[15][1] = "0001 1000 0000 0000";
+					
+					frame.tabelaCodeSegment[16][1] = "0001 0000 0000 0100";
+					frame.tabelaCodeSegment[17][1] = "0000 0000 0000 1001";
+
+					//ADD
+					frame.tabelaCodeSegment[18][1] = "0010 0000 0000 0000";
+					frame.tabelaCodeSegment[19][1] = "0000 0000 0000 0001";
+					
+					//SUB
+					frame.tabelaCodeSegment[20][1] = "0011 0000 0000 0000";
+					frame.tabelaCodeSegment[21][1] = "0000 0000 0000 0111";
+					
+					//PUSH
+					frame.tabelaCodeSegment[22][1] = "1001 0000 0000 0000";
+					frame.tabelaCodeSegment[23][1] = "0000 0000 1010 0110";
+					
+					frame.tabelaCodeSegment[24][1] = "1001 0000 0000 0000";
+					frame.tabelaCodeSegment[25][1] = "0000 0000 1111 0110";
+					
+					frame.tabelaCodeSegment[26][1] = "1001 0100 0001 0000";
+					
+					frame.tabelaCodeSegment[27][1] = "1001 0110 0000 0000";
+					frame.tabelaCodeSegment[28][1] = "0000 0000 0110 1010";
+
+					//POP
+					frame.tabelaCodeSegment[29][1] = "1010 0001 0000 0000";
+					frame.tabelaCodeSegment[30][1] = "0000 0000 1111 1110";
+					
+					frame.tabelaCodeSegment[31][1] = "1010 0000 0000 0000";
+					
+					//PUSH TIL OVERFLOW
+					frame.tabelaCodeSegment[32][1] = "1001 0100 0001 0000";
+					frame.tabelaCodeSegment[33][1] = "1001 0100 0001 0000";
+					frame.tabelaCodeSegment[34][1] = "1001 0100 0001 0000";
+					frame.tabelaCodeSegment[35][1] = "1001 0100 0001 0000";
+					frame.tabelaCodeSegment[36][1] = "1001 0100 0001 0000";
+					frame.tabelaCodeSegment[37][1] = "1001 0100 0001 0000";
+					frame.tabelaCodeSegment[38][1] = "1001 0100 0001 0000";
+					frame.tabelaCodeSegment[39][1] = "1001 0100 0001 0000";
+					frame.tabelaCodeSegment[40][1] = "1001 0100 0001 0000";
+					frame.tabelaCodeSegment[41][1] = "1001 0100 0001 0000";
+					frame.tabelaCodeSegment[42][1] = "1001 0100 0001 0000";
+					frame.tabelaCodeSegment[43][1] = "1001 0100 0001 0000";
+					frame.tabelaCodeSegment[44][1] = "1001 0100 0001 0000";
+					frame.tabelaCodeSegment[45][1] = "1001 0100 0001 0000";
+					frame.tabelaCodeSegment[46][1] = "1001 0100 0001 0000";
+					frame.tabelaCodeSegment[47][1] = "1001 0100 0001 0000";
+					frame.tabelaCodeSegment[48][1] = "1001 0100 0001 0000";
+					frame.tabelaCodeSegment[49][1] = "1001 0100 0001 0000";
+					frame.tabelaCodeSegment[50][1] = "1001 0100 0001 0000";
+
+					
+					//JZ
+					frame.tabelaCodeSegment[51][1] = "0111 0000 0000 0000";
+					frame.tabelaCodeSegment[52][1] = "0000 0001 0000 0110";
+
+					//MOV ACME,00
+					frame.tabelaCodeSegment[53][1] = "0001 0000 0000 0100";
+					frame.tabelaCodeSegment[54][1] = "0000 0000 0000 0000";
+					
+					//JZ
+					frame.tabelaCodeSegment[55][1] = "0111 0000 0000 0000";
+					frame.tabelaCodeSegment[56][1] = "0000 0001 0011 1100";
+					
+					//PUSH TRASH
+					frame.tabelaCodeSegment[57][1] = "1001 0100 0001 0000";
+					frame.tabelaCodeSegment[58][1] = "1001 0100 0001 0000";
+					frame.tabelaCodeSegment[59][1] = "1001 0100 0001 0000";
+					
+					//MOV ACME,DONATELLO
+					frame.tabelaCodeSegment[60][1] = "0001 0100 0010 0100";
+					
+					//AND
+					frame.tabelaCodeSegment[61][1] = "0100 0100 0001 0000";
+					
+					//OR
+					frame.tabelaCodeSegment[62][1] = "0101 0100 0001 0000";
+					
+					//NOT
+					frame.tabelaCodeSegment[63][1] = "0110 0100 0100 0000";
+					
+
+					
+					frame.fixTables();
 					frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -115,21 +267,8 @@ public class MainWindow extends JFrame {
 	 * Create the frame.
 	 */
 	public MainWindow() {
-		tabelaRam = new String[16][17];
-				
-		for(int i=0;i<16;i++){
-			tabelaRam[i][0] = Integer.toHexString(i).toUpperCase()+"0";
-		}
 		
 		
-		tabelaCodeSegment = new String[65280][2];
-		for(int i=0;i<65280;i++){
-			tabelaCodeSegment[i][0] = String.format("%04X", i+256);//Integer.toHexString(i+256).toUpperCase();
-		}
-		
-		tabelaCodeSegment[0][1] = "0001 0000 0000 0000";
-		tabelaCodeSegment[1][1] = "0000 0000 0110 1010";
-		tabelaCodeSegment[2][1] = "0000 0000 0101 1011";
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 712, 745);
@@ -156,7 +295,7 @@ public class MainWindow extends JFrame {
 		contentPane.add(lblRegistradores);
 		
 		JLabel lblCodesegment = new JLabel("CodeSegment");
-		lblCodesegment.setBounds(524, 81, 96, 14);
+		lblCodesegment.setBounds(490, 81, 96, 14);
 		contentPane.add(lblCodesegment);
 		
 		JLabel label = new JLabel("Michelangelo(R1)");
@@ -181,12 +320,12 @@ public class MainWindow extends JFrame {
 		
 		JLabel lblAmericab = new JLabel("AMERICA(B)");
 		lblAmericab.setHorizontalAlignment(SwingConstants.RIGHT);
-		lblAmericab.setBounds(212, 130, 80, 14);
+		lblAmericab.setBounds(202, 130, 80, 14);
 		contentPane.add(lblAmericab);
 		
 		JLabel lblAcmeacc = new JLabel("ACME(ACC)");
 		lblAcmeacc.setHorizontalAlignment(SwingConstants.RIGHT);
-		lblAcmeacc.setBounds(212, 105, 80, 14);
+		lblAcmeacc.setBounds(202, 105, 80, 14);
 		contentPane.add(lblAcmeacc);
 		
 		txtR1 = new JTextField();
@@ -216,20 +355,164 @@ public class MainWindow extends JFrame {
 		txtACC = new JTextField();
 		txtACC.setEditable(false);
 		txtACC.setColumns(10);
-		txtACC.setBounds(310, 102, 77, 20);
+		txtACC.setBounds(300, 102, 77, 20);
 		contentPane.add(txtACC);
 		
 		txtB = new JTextField();
 		txtB.setEditable(false);
 		txtB.setColumns(10);
-		txtB.setBounds(310, 127, 77, 20);
+		txtB.setBounds(300, 127, 77, 20);
 		contentPane.add(txtB);
 		
 		JScrollPane scrollPane = new JScrollPane();
+		scrollPane.setFont(new Font("Dialog", Font.PLAIN, 8));
 		scrollPane.setBounds(10, 416, 367, 279);
 		contentPane.add(scrollPane);
 		
 		txtMemoria = new JTable();
+		txtMemoria.setFont(new Font("Lucida Console", Font.PLAIN, 12));
+		
+		scrollPane.setViewportView(txtMemoria);
+		
+		JScrollPane scrollPane_1 = new JScrollPane();
+		scrollPane_1.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		scrollPane_1.setBounds(420, 103, 240, 594);
+		contentPane.add(scrollPane_1);
+		
+		txtCodeSegment = new JTable();
+		scrollPane_1.setViewportView(txtCodeSegment);
+		
+		JLabel lblPsw = new JLabel("PSW");
+		lblPsw.setHorizontalAlignment(SwingConstants.RIGHT);
+		lblPsw.setBounds(0, 212, 39, 14);
+		contentPane.add(lblPsw);
+		
+		txtPSW = new JTextField();
+		txtPSW.setEditable(false);
+		txtPSW.setColumns(10);
+		txtPSW.setBounds(44, 209, 145, 20);
+		contentPane.add(txtPSW);
+		
+		JLabel lblPc = new JLabel("PC");
+		lblPc.setHorizontalAlignment(SwingConstants.RIGHT);
+		lblPc.setBounds(99, 257, 33, 14);
+		contentPane.add(lblPc);
+		
+		txtPC = new JTextField();
+		txtPC.setEditable(false);
+		txtPC.setColumns(10);
+		txtPC.setBounds(137, 254, 52, 20);
+		contentPane.add(txtPC);
+		
+		JLabel lblMbr = new JLabel("MBR");
+		lblMbr.setHorizontalAlignment(SwingConstants.RIGHT);
+		lblMbr.setBounds(99, 288, 33, 14);
+		contentPane.add(lblMbr);
+		
+		txtMBR = new JTextField();
+		txtMBR.setEditable(false);
+		txtMBR.setColumns(10);
+		txtMBR.setBounds(137, 285, 52, 20);
+		contentPane.add(txtMBR);
+		
+		JLabel lblMar = new JLabel("MAR");
+		lblMar.setHorizontalAlignment(SwingConstants.RIGHT);
+		lblMar.setBounds(99, 317, 33, 14);
+		contentPane.add(lblMar);
+		
+		txtMAR = new JTextField();
+		txtMAR.setEditable(false);
+		txtMAR.setColumns(10);
+		txtMAR.setBounds(137, 314, 52, 20);
+		contentPane.add(txtMAR);
+		
+		JLabel lblMdr = new JLabel("MDR");
+		lblMdr.setHorizontalAlignment(SwingConstants.RIGHT);
+		lblMdr.setBounds(99, 346, 33, 14);
+		contentPane.add(lblMdr);
+		
+		txtMDR = new JTextField();
+		txtMDR.setEditable(false);
+		txtMDR.setColumns(10);
+		txtMDR.setBounds(137, 343, 52, 20);
+		contentPane.add(txtMDR);
+		
+		JLabel panel_1 = new JLabel(new ImageIcon("C:\\dev\\jajar.jpg"));
+		panel_1.setBounds(178, 196, 266, 188);
+		contentPane.add(panel_1);
+		
+		JButton btnProximo = new JButton("Mesa Execute!");
+		btnProximo.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				try{
+					CPU.run();
+				}catch(Exception e){
+					e.printStackTrace();
+				}
+			}
+		});
+		btnProximo.setBounds(202, 155, 125, 39);
+		contentPane.add(btnProximo);
+		
+		JLabel lblLastInstruction = new JLabel("Last Instruction:");
+		lblLastInstruction.setBounds(10, 388, 101, 16);
+		contentPane.add(lblLastInstruction);
+		
+		txtLastInst = new JTextField();
+		txtLastInst.setEditable(false);
+		txtLastInst.setColumns(10);
+		txtLastInst.setBounds(116, 384, 261, 20);
+		contentPane.add(txtLastInst);
+		
+		JLabel lblTrap = new JLabel("Trap:");
+		lblTrap.setHorizontalAlignment(SwingConstants.RIGHT);
+		lblTrap.setBounds(0, 346, 39, 14);
+		contentPane.add(lblTrap);
+		
+		JLabel lblSp = new JLabel("SP");
+		lblSp.setHorizontalAlignment(SwingConstants.RIGHT);
+		lblSp.setBounds(0, 257, 39, 14);
+		contentPane.add(lblSp);
+		
+		txtSP = new JTextField();
+		txtSP.setEditable(false);
+		txtSP.setColumns(10);
+		txtSP.setBounds(44, 254, 52, 20);
+		contentPane.add(txtSP);
+		
+		JCheckBox cmbTrap = new JCheckBox("");
+		cmbTrap.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				CPU.psw.setTrap(CPU.psw.getTrap().getBit()==0?new Bit(true):new Bit(false));
+			}
+		});
+		cmbTrap.setBounds(57, 343, 39, 24);
+		contentPane.add(cmbTrap);
+		
+		JButton btnNewButton = new JButton("R");
+		btnNewButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try {
+					CPU.pc.setWord(new Word(0x0100));
+				} catch (InvalidVarSize e1) {
+					e1.printStackTrace();
+				}
+			}
+		});
+		btnNewButton.setBounds(332, 155, 45, 39);
+		contentPane.add(btnNewButton);
+	}
+	
+	public void fixTables(){
+		txtCodeSegment.setModel(new DefaultTableModel(
+				tabelaCodeSegment,
+				new String[] {
+					"Endere\u00E7o", "Valor"
+				}
+			));
+		txtCodeSegment.getColumnModel().getColumn(0).setPreferredWidth(60);
+		txtCodeSegment.getColumnModel().getColumn(1).setPreferredWidth(180);
+		
 		txtMemoria.setEnabled(false);
 		txtMemoria.setModel(new DefaultTableModel(
 			tabelaRam,
@@ -238,103 +521,12 @@ public class MainWindow extends JFrame {
 			}
 		));
 		
-		txtMemoria.getColumnModel().getColumn(0).setPreferredWidth(25);
-		txtMemoria.getColumnModel().getColumn(1).setPreferredWidth(25);
-		txtMemoria.getColumnModel().getColumn(2).setPreferredWidth(25);
-		txtMemoria.getColumnModel().getColumn(3).setPreferredWidth(25);
-		txtMemoria.getColumnModel().getColumn(4).setPreferredWidth(25);
-		txtMemoria.getColumnModel().getColumn(5).setPreferredWidth(25);
-		txtMemoria.getColumnModel().getColumn(6).setPreferredWidth(25);
-		txtMemoria.getColumnModel().getColumn(7).setPreferredWidth(25);
-		txtMemoria.getColumnModel().getColumn(8).setPreferredWidth(25);
-		txtMemoria.getColumnModel().getColumn(9).setPreferredWidth(25);
-		txtMemoria.getColumnModel().getColumn(10).setPreferredWidth(25);
-		txtMemoria.getColumnModel().getColumn(11).setPreferredWidth(25);
-		txtMemoria.getColumnModel().getColumn(12).setPreferredWidth(25);
-		txtMemoria.getColumnModel().getColumn(13).setPreferredWidth(25);
-		txtMemoria.getColumnModel().getColumn(14).setPreferredWidth(25);
-		txtMemoria.getColumnModel().getColumn(15).setPreferredWidth(25);
-		txtMemoria.getColumnModel().getColumn(16).setPreferredWidth(25);
-		scrollPane.setViewportView(txtMemoria);
+		txtCodeSegment.setSelectionBackground(Color.RED);
 		
-		JScrollPane scrollPane_1 = new JScrollPane();
-		scrollPane_1.setBounds(453, 101, 220, 594);
-		contentPane.add(scrollPane_1);
-		
-		txtCodeSegment = new JTable();
-		txtCodeSegment.setModel(new DefaultTableModel(
-			tabelaCodeSegment,
-			new String[] {
-				"Endere\u00E7o", "Valor"
-			}
-		));
-		txtCodeSegment.getColumnModel().getColumn(0).setPreferredWidth(60);
-		txtCodeSegment.getColumnModel().getColumn(1).setPreferredWidth(160);
-		scrollPane_1.setViewportView(txtCodeSegment);
-		
-		JButton btnProxPasso = new JButton("Iniciar / Proximo");
-		btnProxPasso.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				CPU.execute();
-			}
-		});
-		btnProxPasso.setBounds(211, 155, 176, 39);
-		contentPane.add(btnProxPasso);
-		
-		JLabel lblPsw = new JLabel("PSW");
-		lblPsw.setHorizontalAlignment(SwingConstants.RIGHT);
-		lblPsw.setBounds(10, 228, 103, 14);
-		contentPane.add(lblPsw);
-		
-		txtPSW = new JTextField();
-		txtPSW.setEditable(false);
-		txtPSW.setColumns(10);
-		txtPSW.setBounds(116, 225, 73, 20);
-		contentPane.add(txtPSW);
-		
-		JLabel lblPc = new JLabel("PC");
-		lblPc.setHorizontalAlignment(SwingConstants.RIGHT);
-		lblPc.setBounds(10, 257, 103, 14);
-		contentPane.add(lblPc);
-		
-		txtPC = new JTextField();
-		txtPC.setEditable(false);
-		txtPC.setColumns(10);
-		txtPC.setBounds(116, 254, 73, 20);
-		contentPane.add(txtPC);
-		
-		JLabel lblMbr = new JLabel("MBR");
-		lblMbr.setHorizontalAlignment(SwingConstants.RIGHT);
-		lblMbr.setBounds(10, 288, 103, 14);
-		contentPane.add(lblMbr);
-		
-		txtMBR = new JTextField();
-		txtMBR.setEditable(false);
-		txtMBR.setColumns(10);
-		txtMBR.setBounds(116, 285, 73, 20);
-		contentPane.add(txtMBR);
-		
-		JLabel lblMar = new JLabel("MAR");
-		lblMar.setHorizontalAlignment(SwingConstants.RIGHT);
-		lblMar.setBounds(10, 317, 103, 14);
-		contentPane.add(lblMar);
-		
-		txtMAR = new JTextField();
-		txtMAR.setEditable(false);
-		txtMAR.setColumns(10);
-		txtMAR.setBounds(116, 314, 73, 20);
-		contentPane.add(txtMAR);
-		
-		JLabel lblMdr = new JLabel("MDR");
-		lblMdr.setHorizontalAlignment(SwingConstants.RIGHT);
-		lblMdr.setBounds(10, 346, 103, 14);
-		contentPane.add(lblMdr);
-		
-		txtMDR = new JTextField();
-		txtMDR.setEditable(false);
-		txtMDR.setColumns(10);
-		txtMDR.setBounds(116, 343, 73, 20);
-		contentPane.add(txtMDR);
+		for(int i=0; i<17;i++){
+			txtMemoria.getColumnModel().getColumn(i).setPreferredWidth(25);
+			
+		}
 	}
-	
 }
+

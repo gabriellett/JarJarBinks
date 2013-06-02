@@ -16,17 +16,17 @@ public enum RegisterEnum {
 	}
 	
 	public static RegisterEnum parse(String code){
-		if("000".equalsIgnoreCase(code)){
+		if("0000".equalsIgnoreCase(code)){
 			return Michelangelo;
-		}else if("001".equalsIgnoreCase(code)){
+		}else if("0001".equalsIgnoreCase(code)){
 			return Donatello;
-		}else if("010".equalsIgnoreCase(code)){
+		}else if("0010".equalsIgnoreCase(code)){
 			return Rafael;
-		}else if("011".equalsIgnoreCase(code)){
+		}else if("0011".equalsIgnoreCase(code)){
 			return Leonardo;
-		}else if("100".equalsIgnoreCase(code)){
+		}else if("0100".equalsIgnoreCase(code)){
 			return Acme;
-		}else if("101".equalsIgnoreCase(code)){
+		}else if("0101".equalsIgnoreCase(code)){
 			return America;
 		}else {
 			return null;

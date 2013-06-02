@@ -4,9 +4,11 @@ import br.edu.fei.jarjarbinks.enums.AddressingMode;
 import br.edu.fei.jarjarbinks.enums.OpcodeOrigemDestino;
 import br.edu.fei.jarjarbinks.enums.RegisterEnum;
 import br.edu.fei.jarjarbinks.enums.TipoOrigemDestino;
+import br.edu.fei.jarjarbinks.util.Conversor;
 
 public class Opcode {
 	
+	private String fullOpcode;
 	private String instruction;
 	private AddressingMode addressingMode;
 	private OpcodeOrigemDestino originDestiny;
@@ -14,16 +16,14 @@ public class Opcode {
 	private RegisterEnum destinyRegister;
 	
 	public Opcode(Word word){
-		String opcode = Integer.toBinaryString(word.toInt());
-		while(opcode.length()<16){
-			opcode = "0"+opcode;
-		}
+		fullOpcode = Conversor.fillOpcodeZero(Integer.toBinaryString(word.toInt()));
 		
-		this.setInstruction(opcode.substring(0,4));
-		this.setAddressingMode(AddressingMode.parse(opcode.substring(4, 6)));
-		this.setOriginDestiny(OpcodeOrigemDestino.parse(opcode.substring(6, 8)));
-		this.setSourceRegister(RegisterEnum.parse(opcode.substring(8,12)));
-		this.setDestinyRegister(RegisterEnum.parse(opcode.substring(12, 16)));
+		
+		this.setInstruction(fullOpcode.substring(0,4));
+		this.setAddressingMode(AddressingMode.parse(fullOpcode.substring(4, 6)));
+		this.setOriginDestiny(OpcodeOrigemDestino.parse(fullOpcode.substring(6, 8)));
+		this.setSourceRegister(RegisterEnum.parse(fullOpcode.substring(8,12)));
+		this.setDestinyRegister(RegisterEnum.parse(fullOpcode.substring(12, 16)));
 	}
 
 	public String getInstruction() {

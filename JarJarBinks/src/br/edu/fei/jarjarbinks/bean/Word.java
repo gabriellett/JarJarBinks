@@ -1,7 +1,7 @@
 package br.edu.fei.jarjarbinks.bean;
 
-import br.edu.fei.jarjarbinks.bean.Byte;
 import br.edu.fei.jarjarbinks.exception.InvalidVarSize;
+import br.edu.fei.jarjarbinks.util.Conversor;
 
 public class Word {
 	
@@ -12,20 +12,14 @@ public class Word {
 		this.word[1] = word[1];
 	}
 	
-	public Word(int i){
-		byte res[] = new byte[2];
-		res[0] = (byte) (i >> 8);
-		res[1] = (byte) (i);
+	public Word(int i) throws InvalidVarSize{
+		if(i<0) throw new InvalidVarSize("val<0!");
 		
 		Byte byte1 = new Byte();
 		Byte byte2 = new Byte();
 
-		try{
-			byte1.setValue(res[0]);
-			byte2.setValue(res[1]);
-		}catch(InvalidVarSize ivs){
-			System.out.println("Invalid var size.");
-		}
+		byte1.setValue((short)((i >> 8) & 0xFF));
+		byte2.setValue((short)(i & 0xFF));
 		
 		Byte word[]= new Byte[]{byte1,byte2};
 		
@@ -59,5 +53,10 @@ public class Word {
 		Byte word[]= new Byte[]{byte1,byte2};
 		
 		return new Word(word);
+	}
+	
+	public String toString(){
+		return Conversor.fillOpcodeZero(Integer.toBinaryString(this.toInt()))+"|"+String.format("%04d", this.toInt())+"|"+String.format("%04X", this.toInt());
+		
 	}
 }
