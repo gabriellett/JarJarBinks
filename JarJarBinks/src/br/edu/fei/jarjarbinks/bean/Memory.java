@@ -10,7 +10,7 @@ import br.edu.fei.jarjarbinks.ui.MainWindow;
  * |- 0~~32: Memoria Interna
  * |- 33~~255: Memoria Externa
  * 255~~65536: Code Segment
- * @author Gabriel
+ * @author Gabriel Lett Viviani
  *
  */
 public class Memory {
@@ -38,6 +38,9 @@ public class Memory {
 		if(position<=255){
 			//Update modelo
 			MainWindow.frame.txtMemoria.getModel().setValueAt(String.format("%02X", word.toInt()), position/16,(position%16)+1);
+			
+			MainWindow.frame.txtMemoria.revalidate();
+			MainWindow.frame.txtMemoria.repaint();
 		}
 		memArr.put(position*2, word.getWord()[0]);
 		memArr.put((position*2)+1, word.getWord()[1]);

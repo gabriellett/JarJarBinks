@@ -7,7 +7,9 @@ public enum RegisterEnum {
 	Rafael("010"),
 	Leonardo("011"),
 	Acme("100"),
-	America("101");
+	America("101"),
+	SP("110"),
+	PSW("111");
 
 	String code;
 	
@@ -28,6 +30,10 @@ public enum RegisterEnum {
 			return Acme;
 		}else if("0101".equalsIgnoreCase(code)){
 			return America;
+		}else if("0110".equalsIgnoreCase(code)){
+			return SP;
+		}else if("0111".equalsIgnoreCase(code)){
+			return PSW;
 		}else {
 			return null;
 		}

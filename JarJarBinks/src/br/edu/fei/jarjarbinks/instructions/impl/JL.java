@@ -5,12 +5,15 @@ import br.edu.fei.jarjarbinks.bean.Opcode;
 import br.edu.fei.jarjarbinks.instructions.Common;
 import br.edu.fei.jarjarbinks.instructions.Instruction;
 import br.edu.fei.jarjarbinks.logic.ArithmeticLogicUnit;
+import br.edu.fei.jarjarbinks.ui.FrameLog;
 import br.edu.fei.jarjarbinks.ui.MainWindow;
 
 public class JL implements Instruction{
 	private String opcodeResp = "1110";
 	private String mnemonic = "JAPAO";
 	private String mnemonicEquiv = "JL";
+	private String op1 = "";
+	private String op2 = "";
 	
 	@Override
 	public void execute() throws Exception{
@@ -18,20 +21,23 @@ public class JL implements Instruction{
 		
 		CPU.cu.fetch();
 		CPU.setAuxAddr(CPU.mdr.getWord());
+		op1 = String.format("%04X", CPU.mdr.getWord().toInt());
 		
-		Common.parseOrigin(opcode);
+		op2 = Common.parseOrigin(opcode);
 		
 		ArithmeticLogicUnit.aux1 = CPU.getAuxData();
 		if(ArithmeticLogicUnit.lessThanAcc()){
 			CPU.pc.setWord(CPU.getAuxAddr());
 		}
+
+		MainWindow.frame.setLastInst(mnemonic+" ("+mnemonicEquiv+") "+op1+","+op2);
+		FrameLog.frame.addInstruction(mnemonic+" ("+mnemonicEquiv+") "+op1+","+op2);
 	}
 
 	@Override
 	public boolean checkResponsability() {
 		Opcode opcode = new Opcode(CPU.mdr.getWord());
 		if(opcodeResp.equals(opcode.getInstruction())){
-			MainWindow.frame.setLastInst(mnemonic+" ("+mnemonicEquiv+")");
 			return true;
 		}else{
 			return false;

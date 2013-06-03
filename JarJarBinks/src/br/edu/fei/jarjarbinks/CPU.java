@@ -15,7 +15,7 @@ import br.edu.fei.jarjarbinks.logic.ControlUnit;
 import br.edu.fei.jarjarbinks.ui.MainWindow;
 import br.edu.fei.jarjarbinks.util.Conversor;
 
-public class CPU {
+public class CPU extends Thread{
 	
 	public static final Memory mem = new Memory();
 	
@@ -45,7 +45,7 @@ public class CPU {
 	
 	public static boolean isInitialized = false;
 	
-	private CPU(){
+	public CPU(){
 		/* DO_NOTHING */
 	}
 		
@@ -69,14 +69,22 @@ public class CPU {
 		isInitialized = true;
 	}
 	
-	public static void run() throws Exception{
-		if(!isInitialized){
-			initialize();
-			if(CPU.psw.getTrap().getBit()==1)return;
-		}
-		while(true){
-			cu.executeNextInst();
-			if(CPU.psw.getTrap().getBit()==1)return;
+	public void run(){
+		try{
+			if(!isInitialized){
+				initialize();
+				if(CPU.psw.getTrap().getBit()==1)return;
+			}
+			while(true){
+				cu.executeNextInst();
+				if(CPU.psw.getTrap().getBit()==1){
+					return;
+				}else{
+					sleep(MainWindow.frame.getTxtSleep());
+				}
+			}
+		}catch(Exception e){
+			e.printStackTrace();
 		}
 	}
 	public static AuxiliarRegister getMichelangelo() {
@@ -131,6 +139,15 @@ public class CPU {
 	public static void setAmerica(Word word) {
 		MainWindow.frame.setB(String.format("%04X", word.toInt()));
 		america.setWord(word);
+	}
+
+	public static void setSP(Word word){
+		MainWindow.frame.setB(String.format("%04X", word.toInt()));
+		sp.setWord(word);
+		
+	}
+	public static void getSP(Word word){
+		sp.getWord();
 	}
 
 	public static void setAuxAddr(Word word) {

@@ -8,13 +8,15 @@ import br.edu.fei.jarjarbinks.enums.TipoOrigemDestino;
 
 public class Common {
 	
+	static String op;
+	
 	public static boolean parseImediate(Opcode opcode) throws Exception{
 		if(opcode.getAddressingMode() == AddressingMode.Imediate){
 
 			// Ao minimo um fetch é obrigatorio no caso imediato
 			CPU.cu.fetch();
 			CPU.setAuxData(CPU.mdr.getWord());
-
+			op = "#"+String.format("%04X", CPU.getAuxData().toInt());
 			return true;
 		}
 		return false;
@@ -28,6 +30,7 @@ public class Common {
 
 				CPU.cu.fetch();
 				
+				op = String.format("%04X", CPU.mdr.getWord().toInt());
 				// Carrega valor do endereço no reg aux
 				CPU.mar.setWord(CPU.mdr.getWord());
 				CPU.mem.load();
@@ -35,6 +38,7 @@ public class Common {
 				
 			}else if(opcode.getOrigin() == TipoOrigemDestino.Register){
 				CPU.setAuxData(((AuxiliarRegister) CPU.class.getMethod("get"+opcode.getSourceRegister(), null).invoke(null, null)).getWord());
+				op = opcode.getSourceRegister().name();
 			}
 			return true;
 		}
@@ -45,7 +49,8 @@ public class Common {
 			if(opcode.getOrigin() == TipoOrigemDestino.Memory){
 
 				CPU.cu.fetch();
-				
+
+				op = "@"+String.format("%04X", CPU.mdr.getWord().toInt());
 				// Carrega valor do endereço no reg aux
 				CPU.mar.setWord(CPU.mdr.getWord());
 				CPU.mem.load();
@@ -53,6 +58,7 @@ public class Common {
 				
 			}else if(opcode.getOrigin() == TipoOrigemDestino.Register){
 				CPU.mar.setWord(((AuxiliarRegister) CPU.class.getMethod("get"+opcode.getSourceRegister(), null).invoke(null, null)).getWord());
+				op = "@"+opcode.getSourceRegister().name();
 			}
 			
 			CPU.mem.load();
@@ -62,11 +68,15 @@ public class Common {
 		}
 		return false;
 	}
-	public static void parseOrigin(Opcode opcode) throws Exception{
+	public static String parseOrigin(Opcode opcode) throws Exception{
 		
-		if(parseImediate(opcode)) return;
-		if(parseDirect(opcode)) return;
-		if(parseIndirect(opcode)) return;
+		op = "";
+		
+		if(parseImediate(opcode)) return op;
+		if(parseDirect(opcode)) return  op;
+		if(parseIndirect(opcode)) return op;
+		
+		return op;
 		
 	}
 }
