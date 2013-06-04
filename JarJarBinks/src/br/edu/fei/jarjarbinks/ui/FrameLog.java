@@ -32,6 +32,7 @@ public class FrameLog extends JFrame {
 	 * Create the frame.
 	 */
 	public FrameLog() {
+		setTitle("Instruction Log");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 325, 410);
 		contentPane = new JPanel();

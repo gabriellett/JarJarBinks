@@ -45,22 +45,15 @@ public class CPU extends Thread{
 	
 	public static boolean isInitialized = false;
 	
-	public CPU(){
-		/* DO_NOTHING */
-	}
-		
 	public static void initialize() throws InvalidVarSize{
 		String tabelaCodeSegment[][] = MainWindow.frame.getTabelaCodeSegment();
 		System.out.println("CS VAL [ADDR]:     OPCODE     |INTEG|HEXA");
 		
-		for(int i=0; i<tabelaCodeSegment.length;i++){
-			if(MainWindow.frame.txtCodeSegment.getModel().getValueAt(i,1)!=null){
-				int a = Integer.valueOf(((String)MainWindow.frame.txtCodeSegment.getModel().getValueAt(i,1)).replaceAll(" ", ""),2);
-				System.out.println("CS "+(256+i)+" ["+String.format("%04X", 256+i)+"]:"+Conversor.fillOpcodeZero(Integer.toBinaryString(a))+"|"+String.format("%05d", a)+"|"+String.format("%04X", a));
-				Word wa = new Word(a);
-				mem.setWord(256+i,wa);
-				//mem.setByte(257+(2*i),wa.getWord()[0] );
-				//mem.setByte(258+(2*i),wa.getWord()[1] );
+		for(int line=0; line<tabelaCodeSegment.length;line++){
+			if(MainWindow.frame.existsCodeLine(line)){
+				
+				Word word = MainWindow.frame.getWordFromCodeSegment(line);
+				mem.setWord(256+line,word);
 			}
 		}
 		
