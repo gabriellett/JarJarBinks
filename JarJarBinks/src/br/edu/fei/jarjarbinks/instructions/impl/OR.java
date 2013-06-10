@@ -36,4 +36,9 @@ public class OR implements Instruction{
 			return false;
 		}
 	}
+	
+	@Override
+	public String getDescription() {
+		return mnemonic+" ("+mnemonicEquiv+") :"+opcodeResp;
+	}
 }

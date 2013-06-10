@@ -61,4 +61,9 @@ public class MOV implements Instruction{
 		}
 		
 	}
+	
+	@Override
+	public String getDescription() {
+		return mnemonic+" ("+mnemonicEquiv+") :"+opcodeResp;
+	}
 }

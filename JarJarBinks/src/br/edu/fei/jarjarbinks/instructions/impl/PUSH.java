@@ -52,4 +52,9 @@ public class PUSH implements Instruction{
 		}
 		
 	}
+	
+	@Override
+	public String getDescription() {
+		return mnemonic+" ("+mnemonicEquiv+") :"+opcodeResp;
+	}
 }

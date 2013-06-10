@@ -33,6 +33,7 @@ import br.edu.fei.jarjarbinks.CPU;
 import br.edu.fei.jarjarbinks.bean.Bit;
 import br.edu.fei.jarjarbinks.bean.Word;
 import br.edu.fei.jarjarbinks.exception.InvalidVarSize;
+import br.edu.fei.jarjarbinks.util.ClassUtils;
 import br.edu.fei.jarjarbinks.util.Conversor;
 
 public class MainWindow extends JFrame {
@@ -71,7 +72,7 @@ public class MainWindow extends JFrame {
 	
 	public void setMemoryWord(Word word, int address){
 		
-		this.tblMemory.getModel().setValueAt(String.format("%02X", word.toInt()), address/16,(address%16)+1);
+		this.tblMemory.getModel().setValueAt(String.format("%04X", word.toInt()), address/16,(address%16)+1);
 		
 		this.tblMemory.revalidate();
 		this.tblMemory.repaint();
@@ -97,8 +98,11 @@ public class MainWindow extends JFrame {
 	public void setPC(int val){
 		this.txtPC.setText(String.format("%04X", val));
 		
-
-		this.tblCodeSegment.scrollRectToVisible(MainWindow.frame.tblCodeSegment.getCellRect((val-250),0, true)); 
+		int valSelec = val;
+		if(valSelec<=256){
+			valSelec-=6;
+		}
+		this.tblCodeSegment.scrollRectToVisible(MainWindow.frame.tblCodeSegment.getCellRect((valSelec-250),0, true)); 
 		this.tblCodeSegment.setRowSelectionInterval((val-256), (val-256));
 		this.tblCodeSegment.revalidate();
 		this.tblCodeSegment.repaint();
@@ -145,6 +149,7 @@ public class MainWindow extends JFrame {
 	}
 
 	public void setLastInst(String val){
+		System.out.println("EXECUTED:"+val+"---------------");
 		this.txtLastInst.setText(val);
 	}
 	
@@ -171,8 +176,9 @@ public class MainWindow extends JFrame {
 	 */
 	public static void main(String[] args) {
 		
-		
 		EventQueue.invokeLater(new Runnable() {
+
+			
 			public void run() {
 				try {
 					frame = new MainWindow();
@@ -351,8 +357,9 @@ public class MainWindow extends JFrame {
 		lblRegistradores.setBounds(158, 102, 116, 14);
 		contentPane.add(lblRegistradores);
 		
-		JLabel lblCodesegment = new JLabel("CodeSegment");
-		lblCodesegment.setBounds(488, 103, 96, 14);
+		JLabel lblCodesegment = new JLabel("Code Segment");
+		lblCodesegment.setHorizontalAlignment(SwingConstants.CENTER);
+		lblCodesegment.setBounds(420, 103, 175, 14);
 		contentPane.add(lblCodesegment);
 		
 		JLabel label = new JLabel("Michelangelo(R1)");
@@ -423,7 +430,7 @@ public class MainWindow extends JFrame {
 		
 		JScrollPane scrollPane = new JScrollPane();
 		scrollPane.setFont(new Font("Dialog", Font.PLAIN, 8));
-		scrollPane.setBounds(9, 449, 367, 279);
+		scrollPane.setBounds(9, 449, 651, 279);
 		contentPane.add(scrollPane);
 		
 		tblMemory = new JTable();
@@ -433,7 +440,7 @@ public class MainWindow extends JFrame {
 		
 		codeSegPanel = new JScrollPane();
 		codeSegPanel.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
-		codeSegPanel.setBounds(420, 134, 240, 594);
+		codeSegPanel.setBounds(420, 134, 240, 301);
 		contentPane.add(codeSegPanel);
 		
 		tblCodeSegment = new JTable();
@@ -612,6 +619,27 @@ public class MainWindow extends JFrame {
 		});
 		mnHelp.add(mntmAbout);
 		
+		JButton btnClearCs = new JButton("Clear CS");
+		btnClearCs.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				for(int i=0;i+255<65280;i++){
+					frame.arrCodeSegment[i][1] = "";
+				}
+
+				tblCodeSegment.setModel(new DefaultTableModel(
+						arrCodeSegment,
+						new String[] {
+							"Endere\u00E7o", "Valor"
+						}
+					));
+				tblCodeSegment.getColumnModel().getColumn(0).setPreferredWidth(60);
+				tblCodeSegment.getColumnModel().getColumn(1).setPreferredWidth(180);
+
+			}
+		});
+		btnClearCs.setBounds(574, 96, 86, 26);
+		contentPane.add(btnClearCs);
+		
 		addWindowListener(new WindowAdapter() {
 		    public void windowClosing(WindowEvent e) {
 				int answer = JOptionPane.showConfirmDialog(frame, "Do you really want to terminate Jar Jar Binks CPU? :(", "Exit", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
@@ -635,6 +663,8 @@ public class MainWindow extends JFrame {
 		tblCodeSegment.getColumnModel().getColumn(0).setPreferredWidth(60);
 		tblCodeSegment.getColumnModel().getColumn(1).setPreferredWidth(180);
 		
+		tblCodeSegment.setSelectionBackground(Color.RED);
+		
 		tblMemory.setEnabled(false);
 		tblMemory.setModel(new DefaultTableModel(
 			arrRAM,
@@ -643,10 +673,9 @@ public class MainWindow extends JFrame {
 			}
 		));
 		
-		tblCodeSegment.setSelectionBackground(Color.RED);
 		
 		for(int i=0; i<17;i++){
-			tblMemory.getColumnModel().getColumn(i).setPreferredWidth(25);
+			tblMemory.getColumnModel().getColumn(i).setPreferredWidth(50);
 			
 		}
 	}

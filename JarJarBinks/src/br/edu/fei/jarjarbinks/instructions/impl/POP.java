@@ -62,4 +62,9 @@ public class POP implements Instruction{
 		}
 		
 	}
+	
+	@Override
+	public String getDescription() {
+		return mnemonic+" ("+mnemonicEquiv+") :"+opcodeResp;
+	}
 }

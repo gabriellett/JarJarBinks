@@ -6,4 +6,6 @@ public interface Instruction {
 	public void execute() throws Exception;
 	
 	public boolean checkResponsability();
+	
+	public String getDescription();
 }
